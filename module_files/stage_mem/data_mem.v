@@ -25,7 +25,6 @@ module data_mem (
     input clk,
 
     input      uart_disable,                            // from hazard_unit (whether reading from uart)
-    input      uart_clk,                                // from uart_unit (upg_clk_i)
     input      uart_write_enable,                       // from uart_unit (upg_wen_i)
     input      [`ISA_WIDTH - 1:0] uart_data,            // from uart_unit (upg_dat_i)
     input      [`ROM_DEPTH:0] uart_addr,                 // from uart_unit (upg_adr_i)
@@ -54,8 +53,8 @@ module data_mem (
 
     RAM ram(
         .ena    (~no_op), // disabled unpon no_op
+        .clka   (~clk),
 
-        .clka   (uart_disable ? ~clk                       : uart_clk),
         .addra  (uart_disable ? mem_addr[`ROM_DEPTH + 1:2] : uart_addr[`ROM_DEPTH - 1:0]), // address unit in bytes
         .douta  (mem_read_data),
 

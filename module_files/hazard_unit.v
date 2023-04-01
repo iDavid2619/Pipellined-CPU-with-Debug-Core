@@ -10,9 +10,8 @@ module hazard_unit (
 
     input      uart_complete,                                   // from uart_unit (upg_done_i)
     input      uart_write_enable,                               // from uart_unit (upg_wen_o)
-    output reg uart_disable,                                    // for (1) uart_unit (upg_rst_i)
-                                                                //     (2) instruction_mem (switch to uart write mode)
-                                                                //     (3) data_mem (switch to uart write mode)
+    output reg uart_disable,                                    // for (1) instruction_mem (switch to uart write mode)
+                                                                //     (2) data_mem (switch to uart write mode)
 
     input      branch_instruction,                              // from control_unit (whether it is a branch instruction)
     input      store_instruction,                               // from control_unit (whether it is a strore instruction)
@@ -36,6 +35,7 @@ module hazard_unit (
     input      input_enable,                                    // from data_mem (the keypad input is needed)
     input      input_complete,                                  // from input_unit (user pressed enter)
     input      cpu_pause,                                       // from input_unit (user pressed pause)
+    input      debug_pause,                                     // from debug_unit (the pc reached the breakpoint)
     output reg ignore_pause,                                    // for input_unit (ignore the user resume action during uart transmission)
 
     output reg pc_reset,                                        // for instruction_mem (reset the pc to 0)

@@ -26,13 +26,6 @@ module register_file (
 
     reg [`ISA_WIDTH - 1:0] registers [`ISA_WIDTH - 1:0];
 
-    // always @(negedge clk) begin
-    //     if (~id_no_op) begin
-    //         read_data_1 <= registers[read_reg_addr_1];
-    //         read_data_2 <= registers[read_reg_addr_2];
-    //     end
-    // end
-
     integer i;
     always @(negedge clk, negedge rst_n) begin
         if (~rst_n)

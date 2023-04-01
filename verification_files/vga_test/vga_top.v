@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-`include "../../new/definitions.v"
+`include "../../module_files/definitions.v"
 
 module vga_top (
     input clk, rst_n,
@@ -24,7 +24,7 @@ module vga_top (
         .x(x), .y(y),
         .vga_write_enable(vga_write_enable),
         .vga_store_data(32'h8000_0008),
-        .issue_type(`KEYPAD),
+        .issue_type(`ISSUE_KEYPAD),
         .switch_enable(switch_enable),
         .vga_rgb(vga_rgb)
     );

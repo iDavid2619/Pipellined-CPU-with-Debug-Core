@@ -104,8 +104,7 @@
 //---------------------------------Clocks---------------------------------------//
 `define KEYPAD_DELAY_PERIOD 250_000             // for keypad_unit to scan every 0.25s (0.25s needed to confirm the key)
 `define TUBE_DELAY_PERIOD   100_000             // for tube to be refreshed every 1ms
-`define UART_DELAY_PERIOD   10                  // for uart_unit (from 100MHz to 10MHz)
-`define VGA_DELAY_PERIOD    4                   // for vga_unit (from 100MHz 50 25MHz)
+`define VGA_DELAY_PERIOD    4                   // for vga_unit (from 100MHz to 25MHz)
 `define CPU_DELAY_PERIOD    1                   // for all cpu components (100MHz)
 //------------------------------------------------------------------------------//
 

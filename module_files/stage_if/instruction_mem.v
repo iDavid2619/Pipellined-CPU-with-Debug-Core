@@ -19,7 +19,6 @@ module instruction_mem (
     input clk, rst_n,
 
     input      uart_disable,                            // from hazard_unit (whether reading from uart)
-    input      uart_clk,                                // from uart_unit (upg_clk_i)
     input      uart_write_enable,                       // from uart_unit (upg_wen_i)
     input      [`ISA_WIDTH - 1:0] uart_data,            // from uart_unit (upg_dat_i)
     input      [`ROM_DEPTH:0] uart_addr,                // from uart_unit (upg_adr_i)
@@ -37,6 +36,7 @@ module instruction_mem (
 
     output reg [`ISA_WIDTH - 1:0] pc,                   // for (1) hazard_unit (to detect UART hazard)
                                                         //     (2) if_id_reg (jal store into 31st register)
+                                                        //     (3) debug_unit (check if the pc reaches breakpoint)
     output     [`ISA_WIDTH - 1:0] instruction           // for if_id_reg (the current instruction)
     );
 
@@ -45,8 +45,8 @@ module instruction_mem (
 
     ROM rom(
         .ena    (~if_no_op), // disabled unpon no_op
-
-        .clka   (uart_disable ? ~clk                 : uart_clk),
+        .clka   (~clk),
+        
         .addra  (uart_disable ? pc[`ROM_DEPTH + 1:2] : uart_addr[`ROM_DEPTH - 1:0]), // pc address is in unit of words
         .douta  (instruction),
 

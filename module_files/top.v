@@ -22,12 +22,10 @@ module top (
     // clocks
     wire clk_cpu;  // for cpu components except hazard_unit (100MHz)
     wire clk_vga;  // for vga_unit (25MHz)
-    wire clk_uart; // for uart_unit (10MHz)
     wire clk_tube; // for seven_seg_unit
     
     clk_generator #(`CPU_DELAY_PERIOD)  cpu_clk_generator (clk_raw, rst_n, clk_cpu);
     clk_generator #(`VGA_DELAY_PERIOD)  vga_clk_generator (clk_raw, rst_n, clk_vga);
-    clk_generator #(`UART_DELAY_PERIOD) uart_clk_generator(clk_raw, rst_n, clk_uart);
     clk_generator #(`TUBE_DELAY_PERIOD) tube_clk_generator(clk_raw, rst_n, clk_tube);
         
     // no_op
@@ -175,8 +173,7 @@ module top (
     wire [7:0] keypad_unit_key_coord;
 
     // uart unit
-    wire uart_unit_clk_out,
-         uart_unit_write_enable,
+    wire uart_unit_write_enable,
          uart_unit_uart_complete;
     wire [`ISA_WIDTH - 1:0] uart_unit_write_data;
     wire [`RAM_DEPTH:0] uart_unit_write_address;
@@ -184,12 +181,6 @@ module top (
 
     // LED
     assign uart_in_progress = hazard_unit_uart_disable ? 1'b0 : 1'b1;
-
-    // always @(posedge clk_cpu, negedge rst_n) begin
-    //     if (~rst_n)                         uart_in_progress <= 1'b0;
-    //     else if (~hazard_unit_uart_disable) uart_in_progress <= 1'b1;
-    //     else                                uart_in_progress <= 1'b0;
-    // end
 
     //// module list
 
@@ -266,7 +257,6 @@ module top (
         .rst_n                  (rst_n),
 
         .uart_disable           (hazard_unit_uart_disable),
-        .uart_clk               (uart_unit_clk_out),
         .uart_write_enable      (uart_unit_write_enable),
         .uart_data              (uart_unit_write_data),
         .uart_addr              (uart_unit_write_address),
@@ -467,7 +457,6 @@ module top (
         .clk                    (clk_cpu),
 
         .uart_disable           (hazard_unit_uart_disable),
-        .uart_clk               (uart_unit_clk_out),
         .uart_write_enable      (uart_unit_write_enable),
         .uart_data              (uart_unit_write_data),
         .uart_addr              (uart_unit_write_address),
@@ -532,7 +521,6 @@ module top (
         .uart_rx                (uart_rx),
         
         .uart_tx                (uart_tx),
-        .uart_clk_out           (uart_unit_clk_out),
         .uart_addr              (uart_unit_write_address),
         .uart_data              (uart_unit_write_data),
         .uart_write_enable      (uart_unit_write_enable),

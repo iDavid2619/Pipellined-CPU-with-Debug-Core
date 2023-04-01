@@ -69,20 +69,8 @@ module signal_mux (
             3'b100 : mux_reg_dest_idx <= id_reg_2_idx;       // I type instruction
             3'b010 : mux_reg_dest_idx <= 0;                  // branch or jump register instruction
             3'b001 : mux_reg_dest_idx <= `JAL_REG_IDX;       // jump and link store to 31st register
-            // 4'b0001: mux_reg_dest_idx <= id_reg_1_idx;       // jump register reterives from 1st register
             default: mux_reg_dest_idx <= id_reg_dest_idx;    // R type instruction
         endcase
     end
-
-    // assign mux_reg_dest_idx = select_dest({i_type_instruction, i_type_abnormal, jal_instruction, jr_instruction});
-    // function [`REG_FILE_ADDR_WIDTH - 1:0] select_dest(input reg [3:0] selector);
-    //     case (selector)
-    //         4'b1000: select_dest = id_reg_2_idx;       // I type instruction
-    //         4'b0100: select_dest = 0;                  // store or branch instruction
-    //         4'b0010: select_dest = 31;                 // jump and link store to 31st register
-    //         4'b0001: select_dest = id_reg_1_idx;       // jump register reterives from 1st register
-    //         default: select_dest = id_reg_dest_idx;    // R type instruction
-    //     endcase
-    // endfunction
     
 endmodule
