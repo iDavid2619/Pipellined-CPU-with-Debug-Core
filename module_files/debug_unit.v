@@ -27,8 +27,11 @@ module debug_unit (
     reg [ISA_BYTE_IDX_WIDTH - 1:0] uart_byte_idx;
 
     localparam  PERIOD_WIDTH = 10,
-                FULL_PERIOD  = 867,                 // CPU clock to UART clock (100MHz -> 115200Hz) - last cycle
-                HALF_PERIOD  = 432;                 // 868 / 2 - 2: half of delay (to capture the center of a bit) - discover cycle - last cycle
+                FULL_PERIOD  = 10'd867,             // CPU clock to UART clock (100MHz -> 115200Hz) - last cycle
+                HALF_PERIOD  = 10'd432;             // 868 / 2 - 2: half of delay (to capture the center of a bit) - discover cycle - last cycle
+    // localparam  PERIOD_WIDTH = 10,
+    //             FULL_PERIOD  = 7,
+    //             HALF_PERIOD  = 2;
     reg [PERIOD_WIDTH - 1:0] rx_delay, tx_delay;
 
     localparam  // to client
@@ -46,12 +49,12 @@ module debug_unit (
                 RX_START       = 3'b001,    // start bit detected
                 RX_DATA        = 3'b010,    // collecting data bits
                 RX_STOP        = 3'b011,    // stop bit detected
-                RX_WAIT        = 3'b111;    // wait for the next byte to carry on
+                RX_WAIT        = 3'b100;    // wait for the next byte to carry on
     reg [RX_STATE_WIDTH - 1:0] rx_state;
 
     localparam  TX_STATE_WIDTH = 1,
-                TX_IDLE        = 1'b1,  // uart waiting for output
-                TX_SEND        = 1'b0;  // sending the data (with start and stop bits)
+                TX_IDLE        = 1'b0,  // uart waiting for output
+                TX_SEND        = 1'b1;  // sending the data (with start and stop bits)
     reg tx_state;
 
     localparam  CORE_RX_STATE_WIDTH = 2,
@@ -86,7 +89,7 @@ module debug_unit (
     reg       tx_start, tx_complete;
 
     reg [`ISA_WIDTH - 1:0] breakpoint;
-    wire                   breakpoint_reached = (breakpoint == pc) | (breakpoint + 4 == pc);
+    wire                   breakpoint_reached = (breakpoint == pc);
 
     reg    debug_write_enable;
     assign uart_write_enable = debug_write_enable & rx_complete;
@@ -164,8 +167,8 @@ module debug_unit (
                             rx_delay      <= 0;
                             rx_state      <= RX_IDLE;
 
-                            uart_complete <= 1'b1;  // (1) notify hazard unit that the transfer is completed
-                                                    // (2) turn off debug_write_enable
+                            uart_complete <= (core_rx_state == CORE_RX_PROGRAM);    // (1) notify hazard unit that the transfer is completed
+                                                                                    // (2) turn off debug_write_enable
                         end
                         default:
                             rx_delay      <= rx_delay + 1; 
@@ -283,7 +286,7 @@ module debug_unit (
                         end
                         // trigger breakpoint_reached in next cycle
                         OP_NEXT    : begin
-                            breakpoint    = breakpoint + 1;
+                            breakpoint    = breakpoint + 4;
                         end
                         default    :
                             if (breakpoint_reached) begin

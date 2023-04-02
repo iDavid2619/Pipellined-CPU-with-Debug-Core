@@ -92,7 +92,7 @@ module hazard_unit (
             uart_disable       = 1'b1;
 
             issue_type         = `ISSUE_NONE;
-            cpu_state          = IDLE;
+            cpu_state          = EXECUTE;
 
             if_hazard_control  = `HAZD_CTL_NORMAL;
             id_hazard_control  = `HAZD_CTL_NORMAL;
@@ -369,7 +369,7 @@ module hazard_unit (
                         default      : 
                             cpu_state = cpu_state; // prevent auto latches
                     endcase
-                /* this is the IDLE state, gives one cycle for the IF stage to complete */
+                /* this is the IDLE state */
                 default: 
                     cpu_state = EXECUTE;
             endcase   
