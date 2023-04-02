@@ -38,12 +38,13 @@ module top_testbench ();
     reg  [3:0]  row_in = 4'hf;
     reg  [15:0] row_in_reg = 16'hffff;
     reg  [3:0]  keys [KEYPRESS_CNT - 1:0];
+    reg         uart_rx = 1;
     
     top uut(
         .clk_raw            (clk),
         .rst_n              (rst_n),
         .switch_map         (8'b1111_1111),
-        .uart_rx            (1'b0),
+        .uart_rx            (uart_rx),
         .row_in             (row_in),
         .col_out            (col_out),
         .seg_tube           (seg_tube),   
