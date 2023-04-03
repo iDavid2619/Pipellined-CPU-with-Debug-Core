@@ -146,13 +146,14 @@ module top_testbench ();
         case (opcode)
                                  /* {STOP     BYTE     START} */
             OP_NONE   : serialize = {1'b1,  {8{1'b1}},  1'b1};
-            default   : serialize = {1'b1,  opcode,     1'b0};
+            default   : serialize = {1'b1,   opcode,    1'b0};
         endcase
     endfunction
 
     // simulate uart transmission
     initial begin
         for (i = 0; i < SIGNAL_CNT; i = i + 1) signals[i] = OP_NONE;
+        signals[0]  = OP_PING;
         signals[1]  = OP_RESUME;
         signals[2]  = 4;           // breakpoint at 2nd instruction
         signals[3]  = 0;
