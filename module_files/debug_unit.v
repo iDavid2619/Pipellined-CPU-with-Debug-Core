@@ -18,6 +18,8 @@ module debug_unit (
                                                 //     (2) instruction_mem
                                                 //     (3) data_mem
 
+    output [7:0] rx_light,
+
     output reg debug_pause,                     // for hazard_unit (to pause the CPU)
     output reg uart_complete                    // for hazard_unit (programming completed)
     );
@@ -72,8 +74,8 @@ module debug_unit (
     reg [CORE_TX_STATE_WIDTH - 1:0] core_tx_state;
     
     localparam  SIGNALS_WIDTH          = `ISA_WIDTH * 2,            //// [TODO] demo only !!! ////
-                SIGNALS_BYTE_CNT       = SIGNALS_WIDTH / 8 - 1,
-                SIGNALS_BYTE_CNT_WIDTH = 3;                         // ceil(sqrt(SIGNALS_WIDTH / 8)): has to be calculated [TODO]
+                SIGNALS_BYTE_CNT       = SIGNALS_WIDTH / 8,
+                SIGNALS_BYTE_CNT_WIDTH = 4;                         // ceil(sqrt(SIGNALS_WIDTH / 8)): has to be calculated [TODO]
     reg  [SIGNALS_BYTE_CNT_WIDTH - 1:0] signals_byte_idx;
     wire [SIGNALS_WIDTH - 1:0]          signals = {
                                                       instruction,
@@ -210,12 +212,14 @@ module debug_unit (
         end
     end
 
+    assign rx_light = rx_byte;
+
     always @(posedge clk, negedge rst_n) begin
         if (~rst_n) begin
             // transmission
             tx_byte            <= {1'b1, {(UART_LEN){1'b0}}, 1'b0};
             tx_start           <= 1'b0;
-            signals_byte_idx   <= 0;
+            signals_byte_idx   <= 1;
             core_tx_state      <= CORE_TX_IDLE;
             
             // reception
@@ -225,7 +229,7 @@ module debug_unit (
             }                  <= 0;
             uart_addr          <= -1;
             uart_write_enable  <= 1'b0;
-            breakpoint         <= 0;
+            breakpoint         <= 64;
             debug_pause        <= 1'b0;
             core_rx_state      <= CORE_RX_OPCODE;
         end else begin
@@ -237,8 +241,7 @@ module debug_unit (
                             core_tx_state        <= CORE_TX_IDLE;
 
                             tx_start             <= 1'b0;
-                            signals_byte_idx     <= 1;
-                            tx_byte[1+:UART_LEN] <= signals[(signals_byte_idx * UART_LEN)+:UART_LEN];
+                            signals_byte_idx     <= 1; // starts from 1 as the 0th byte will be sent when received opcode
                         end
                         2'b10  : begin
                             signals_byte_idx     <= signals_byte_idx + 1;
@@ -313,7 +316,7 @@ module debug_unit (
                     CORE_RX_PROGRAM : begin
                         if (uart_complete) begin
                             core_rx_state      <= CORE_RX_OPCODE;
-                            
+
                             uart_addr          <= -1;
                             uart_data          <= 0;
                         end else if (uart_byte_idx == ISA_BYTE_CNT) begin
